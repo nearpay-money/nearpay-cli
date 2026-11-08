@@ -496,15 +496,11 @@ export async function startFakeNearPay(o: FakeOptions = {}): Promise<FakeNearPay
     r.next_action = null;
     emit("refund.pending", bump(r));
     later(() => {
-      if (BigInt(r.amount) % 100n === 4n) {
-        r.status = "failed";
-        r.failure_code = "provider_failed";
-        emit("refund.failed", bump(r));
-      } else {
-        r.status = "succeeded";
-        r.succeeded_at = now();
-        emit("refund.succeeded", bump(r));
-      }
+      // scenario 04 fails after the transfer: the real stack holds the leg for review and the refund stays pending
+      if (BigInt(r.amount) % 100n === 4n) return;
+      r.status = "succeeded";
+      r.succeeded_at = now();
+      emit("refund.succeeded", bump(r));
     });
     return undefined;
   });

@@ -146,7 +146,7 @@ async function paidIntent(ctx: TriggerContext, event: string): Promise<{ cs: str
 
 /**
  * Refund amount ≤ what settled whose last two digits are `suffix` (the refund leg's sandbox scenario:
- * `00` succeeds, `04` fails after processing).
+ * `00` succeeds; `04` fails after processing, which rails holds for review — the refund stays pending).
  */
 export function refundAmount(settled: string, suffix: 0 | 4): string {
   const s = BigInt(settled);
@@ -451,18 +451,9 @@ export const TRIGGERS = {
       };
     },
   },
-  "refund.failed": {
-    kind: "supported",
-    summary: "paid intent → refund (amount …04: the leg fails after processing) → simulated transfer",
-    run: async (ctx) => {
-      const r = await refund(ctx, "refund.failed", 4);
-      await sendRefundLeg(ctx, r.refund);
-      return {
-        target: { type: "refund.failed", objectId: r.refund.id },
-        objects: { checkout_session: r.cs, refund: r.refund.id },
-      };
-    },
-  },
+  "refund.failed": unsupported(
+    "no fast public test-mode path to a failed refund: a refund leg that fails after the merchant's transfer (sandbox scenario 04) is held for review (the refund stays pending, review.opened), and the scenario that returns the transfer (02) only resolves at the leg's deadline",
+  ),
   "refund.canceled": {
     kind: "supported",
     summary: "paid intent → refund → cancel before signing",
