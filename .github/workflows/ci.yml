@@ -1,0 +1,75 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      # @nearpay/* and @nearpay-internal/* come from a registry: the local Verdaccio in development,
+      # GitHub Packages once remotes exist (repository variable NP_REGISTRY_URL + secret NP_REGISTRY_TOKEN).
+      - name: Point the NearPay scopes at the CI registry
+        if: ${{ vars.NP_REGISTRY_URL != '' }}
+        env:
+          NP_REGISTRY_URL: ${{ vars.NP_REGISTRY_URL }}
+          NP_REGISTRY_TOKEN: ${{ secrets.NP_REGISTRY_TOKEN }}
+        run: |
+          host="${NP_REGISTRY_URL#http:}"
+          host="${host#https:}"
+          {
+            echo "@nearpay:registry=${NP_REGISTRY_URL}"
+            echo "@nearpay-internal:registry=${NP_REGISTRY_URL}"
+            echo "${host}:_authToken=${NP_REGISTRY_TOKEN}"
+          } > .npmrc
+      - run: pnpm install --frozen-lockfile
+      # typecheck, lint, coverage-gated unit tests, build, integration tests (the built binary against a
+      # spec-validating fake API with SSE; no containers, no network)
+      - run: pnpm verify
+      - run: npm pack --dry-run
+
+  # Single-file binaries (bun build --compile), one per OS: the keychain addon is platform-specific.
+  binaries:
+    needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.x
+      - name: Point the NearPay scopes at the CI registry
+        if: ${{ vars.NP_REGISTRY_URL != '' }}
+        shell: bash
+        env:
+          NP_REGISTRY_URL: ${{ vars.NP_REGISTRY_URL }}
+          NP_REGISTRY_TOKEN: ${{ secrets.NP_REGISTRY_TOKEN }}
+        run: |
+          host="${NP_REGISTRY_URL#http:}"
+          host="${host#https:}"
+          {
+            echo "@nearpay:registry=${NP_REGISTRY_URL}"
+            echo "@nearpay-internal:registry=${NP_REGISTRY_URL}"
+            echo "${host}:_authToken=${NP_REGISTRY_TOKEN}"
+          } > .npmrc
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:binaries
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nearpay-${{ matrix.os }}
+          path: dist-bin/
+          if-no-files-found: error

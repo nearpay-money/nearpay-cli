@@ -1,7 +1,7 @@
 # AGENTS.md — nearpay-cli
 
 You are working in **nearpay-cli**, one of 27 NearPay repositories (`nearpay-brain/architecture/repositories.md`).
-Scope: Developer CLI: login, listen (forward webhooks to localhost), trigger test events, tail logs, resend events.
+Scope: Developer CLI (test mode): login, listen (forward events to localhost, re-signed like webhooks), trigger test events, list and resend events. `logs tail` is not in v1 (no request-log API).
 
 ## Before changing anything
 
@@ -11,7 +11,10 @@ Scope: Developer CLI: login, listen (forward webhooks to localhost), trigger tes
 
 ## Rules for this repo
 
-- Uses only the public API; credentials stored in the OS keychain.
+- Uses only the public API (route table and types from `@nearpay/spec`); credentials stored in the OS keychain
+  (file fallback only when no keychain exists, warned). Test mode only: refuse live keys.
+- Tests: `pnpm test` (unit, property) runs freely; `pnpm test:integration` / `pnpm verify` build and spawn the
+  binary — on the shared machine run them under `flock /tmp/np-heavy.lock`.
 
 ## Never
 
