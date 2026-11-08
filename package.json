@@ -1,0 +1,62 @@
+{
+  "name": "@nearpay/cli",
+  "version": "0.1.0",
+  "description": "NearPay developer CLI (test mode): log in with a device code, stream events and forward them to localhost re-signed like webhooks, trigger real test-mode events, list and resend events.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22.11.0"
+  },
+  "bin": {
+    "nearpay": "./dist/cli.js"
+  },
+  "exports": {
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "nearpay",
+    "payments",
+    "cli",
+    "webhooks",
+    "near-intents"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && chmod +x dist/cli.js",
+    "build:binaries": "node scripts/build-binaries.mjs",
+    "test": "vitest run --project unit",
+    "test:integration": "pnpm build && vitest run --project integration",
+    "test:all": "pnpm build && vitest run",
+    "coverage": "vitest run --project unit --coverage",
+    "verify": "pnpm typecheck && pnpm lint && pnpm coverage && pnpm test:integration"
+  },
+  "dependencies": {
+    "@napi-rs/keyring": "2.1.2",
+    "@nearpay/spec": "0.3.0",
+    "commander": "14.0.3",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.5",
+    "@nearpay/node": "0.1.0",
+    "@types/node": "22.20.5",
+    "@vitest/coverage-v8": "2.1.9",
+    "fast-check": "4.10.2",
+    "typescript": "5.9.3",
+    "vitest": "2.1.9"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
