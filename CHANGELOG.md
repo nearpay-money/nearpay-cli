@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- `trigger refund.failed` is reported as not supported instead of waiting for an event the real stack never emits:
+  a refund leg that fails after the merchant's transfer (sandbox scenario 04) is held for review by rails
+  (`failed_after_deposit`), so the refund stays `pending` and `review.opened` follows (found in step 3.4 E2E).
+
 ## 0.1.0 — 2026-11-08
 
 First release (Stage 3, step 3.3; `nearpay-brain/lld/sdks-and-tools.md` §3, spec 0.3.0).

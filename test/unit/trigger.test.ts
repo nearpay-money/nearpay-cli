@@ -63,9 +63,13 @@ describe("trigger fixtures", () => {
     expect(supported).toEqual(
       expect.arrayContaining(["payment_intent.succeeded", "payment_intent.payment_failed", "invoice.paid"]),
     );
+    // every refund type but refund.failed: a leg failing after the transfer is held for review on the real stack
     expect(
-      WEBHOOK_TYPE_NAMES.filter((t) => t.startsWith("refund.")).every((t) => TRIGGERS[t].kind === "supported"),
+      WEBHOOK_TYPE_NAMES.filter((t) => t.startsWith("refund.") && t !== "refund.failed").every(
+        (t) => TRIGGERS[t].kind === "supported",
+      ),
     ).toBe(true);
+    expect(TRIGGERS["refund.failed"]).toMatchObject({ kind: "unsupported", reason: expect.stringMatching(/held/) });
   });
 
   it.each(supported)("%s: real API calls with the CLI key produce the event", async (type) => {
@@ -104,10 +108,9 @@ describe("trigger fixtures", () => {
     const pays = fake.mock.callsTo(payCheckoutSessionTestHelper);
     expect(pays.some((p) => p.body.outcome === "none")).toBe(true); // overpaid: older open quote first
     const sims = fake.mock.callsTo(simulateRefundDeposit).length;
-    expect(sims).toBeGreaterThanOrEqual(3);
+    expect(sims).toBeGreaterThanOrEqual(2);
     const amounts = fake.mock.callsTo(createRefund).map((r) => BigInt(r.body.amount ?? "0") % 100n);
-    expect(amounts).toContain(4n);
-    expect(amounts).toContain(0n);
+    expect(amounts.every((a) => a === 0n)).toBe(true);
     expect(AMOUNTS).toEqual({ normal: 1000, short: 1005, duplicate: 1006 });
   });
 
