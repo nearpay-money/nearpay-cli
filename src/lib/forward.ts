@@ -3,7 +3,7 @@
  * (lld/webhooks.md §6): POST, the raw event JSON as body, `Content-Type: application/json; charset=utf-8`,
  * `NearPay-Signature` (local secret), `NearPay-Event-Id`, `NearPay-Event-Type`, no redirects, 10 s timeout.
  */
-import { HEADERS } from "@nearpay/spec";
+import { HEADERS } from "@nearpay-money/spec";
 import { isLoopbackHost } from "./api.js";
 import { CliError, EXIT } from "./errors.js";
 import { signatureHeader } from "./signing.js";

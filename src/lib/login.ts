@@ -10,7 +10,7 @@ import {
   type CliLogin as CliLoginSchema,
   createCliLogin,
   pollCliLogin,
-} from "@nearpay/spec";
+} from "@nearpay-money/spec";
 import type { z } from "zod";
 import type { ApiClient } from "./api.js";
 import type { OpenUrl } from "./browser.js";

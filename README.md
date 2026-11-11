@@ -2,14 +2,14 @@
 
 > Developer CLI: login, listen (forward webhooks to localhost), trigger test events, resend events.
 
-|                                       |                                                                                   |
-| ------------------------------------- | --------------------------------------------------------------------------------- |
-| Group                                 | SDKs & tools                                                                      |
-| Kind                                  | binary                                                                            |
-| Ships as                              | npm: `@nearpay/cli` (bin `nearpay`) + standalone binaries (`bun build --compile`) |
-| Owns                                  | CLI                                                                               |
-| Depends on (published artifacts only) | `@nearpay/spec` 0.3.0 (public)                                                    |
-| First built in                        | Stage 3 (step 3.3)                                                                |
+|                                       |                                                                                         |
+| ------------------------------------- | --------------------------------------------------------------------------------------- |
+| Group                                 | SDKs & tools                                                                            |
+| Kind                                  | binary                                                                                  |
+| Ships as                              | npm: `@nearpay-money/cli` (bin `nearpay`) + standalone binaries (`bun build --compile`) |
+| Owns                                  | CLI                                                                                     |
+| Depends on (published artifacts only) | `@nearpay-money/spec` 0.5.0 (public)                                                    |
+| First built in                        | Stage 3 (step 3.3)                                                                      |
 
 **Test mode only.** The CLI talks to the public API only, with a restricted **test** key it gets from
 `nearpay login` (or a `sk_test_` / `rk_test_` key you pass). Live keys are refused before any request.
@@ -17,11 +17,14 @@
 ## Install
 
 ```sh
-npm install -g @nearpay/cli      # Node ≥ 22.11
+npm install -g @nearpay-money/cli      # Node ≥ 22.11
 nearpay --help
 ```
 
 Or download the single-file binary for your OS from the CI artifacts (`nearpay-<platform>-<arch>`).
+
+Documentation: https://docs.nearpay.money · Website: https://nearpay.money. Before 0.2.0 the package was named
+`@nearpay/cli` on NearPay's private registry only; NearPay never publishes under the `@nearpay` npm scope.
 
 ## Do X → see Y
 
@@ -49,30 +52,30 @@ HMAC-SHA256 over `<t>.<raw body>` with the session secret; no `v1a` Ed25519 sign
 `NearPay-Event-Id` / `NearPay-Event-Type`. Use the printed secret in your handler:
 
 ```ts
-import { constructEvent } from "@nearpay/node";
+import { constructEvent } from "@nearpay-money/node";
 const event = constructEvent(rawBody, req.headers["nearpay-signature"], process.env.NEARPAY_WEBHOOK_SECRET);
 ```
 
 The secret changes every run. Forwarded events are the stream's events — they are not webhook
 deliveries and are not retried; your endpoint's status is only printed.
 
-### Triggerable events (spec 0.3.0)
+### Triggerable events (spec 0.5.0)
 
 Every fixture is made of real test-mode API calls; sandbox outcomes follow the documented scenario
 amounts (sandbox §4).
 
-| Event                                                                                                          | How                                                                                                                                                                                                                                                                                             |
-| -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `payment_intent.created` / `.processing` / `.succeeded`, `checkout.session.completed`                          | checkout session → `payCheckoutSessionTestHelper` (outcome `succeeded`)                                                                                                                                                                                                                         |
-| `payment_intent.payment_failed`                                                                                | the same with outcome `payment_failed`                                                                                                                                                                                                                                                          |
-| `payment_intent.requires_review`                                                                               | USD 10.05 session: scenario `05` settles one base unit short                                                                                                                                                                                                                                    |
-| `payment_intent.overpaid`                                                                                      | USD 10.06 session: an open quote, then a paid one; scenario `06` also pays the older quote                                                                                                                                                                                                      |
-| `payment_intent.canceled`                                                                                      | session → cancel the intent (needs `--api-key sk_test_…`: the CLI key has no `payment_intents.write`)                                                                                                                                                                                           |
-| `checkout.session.expired`                                                                                     | session → expire                                                                                                                                                                                                                                                                                |
-| `refund.created` / `.requires_action` / `.pending` / `.succeeded` / `.canceled`                                | paid intent → `createRefund` (amount ending `00`) → `simulateRefundDeposit` / `cancelRefund`                                                                                                                                                                                                    |
-| `invoice.created` / `.finalized` / `.sent` / `.paid` / `.payment_failed` / `.voided` / `.marked_uncollectible` | billing routes; payment through the hosted invoice session                                                                                                                                                                                                                                      |
-| `customer.subscription.created` / `.updated` / `.deleted`                                                      | monthly price, 30-day trial → update (`cancel_at_period_end`) → cancel                                                                                                                                                                                                                          |
-| not supported                                                                                                  | `refund.failed` (a leg failing after the transfer is held for review; the refund stays pending), `invoice.overdue`, `customer.subscription.renewal_upcoming` (need a billing clock test helper), `agent_payment.*` (needs a sandbox-funded agent signer), `review.*`, `account.updated`, `ping` |
+| Event                                                                                                          | How                                                                                                                                                                                                                                                                                                                                                 |
+| -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payment_intent.created` / `.processing` / `.succeeded`, `checkout.session.completed`                          | checkout session → `payCheckoutSessionTestHelper` (outcome `succeeded`)                                                                                                                                                                                                                                                                             |
+| `payment_intent.payment_failed`                                                                                | the same with outcome `payment_failed`                                                                                                                                                                                                                                                                                                              |
+| `payment_intent.requires_review`                                                                               | USD 10.05 session: scenario `05` settles one base unit short                                                                                                                                                                                                                                                                                        |
+| `payment_intent.overpaid`                                                                                      | USD 10.06 session: an open quote, then a paid one; scenario `06` also pays the older quote                                                                                                                                                                                                                                                          |
+| `payment_intent.canceled`                                                                                      | session → cancel the intent (needs `--api-key sk_test_…`: the CLI key has no `payment_intents.write`)                                                                                                                                                                                                                                               |
+| `checkout.session.expired`                                                                                     | session → expire                                                                                                                                                                                                                                                                                                                                    |
+| `refund.created` / `.requires_action` / `.pending` / `.succeeded` / `.canceled`                                | paid intent → `createRefund` (amount ending `00`) → `simulateRefundDeposit` / `cancelRefund`                                                                                                                                                                                                                                                        |
+| `invoice.created` / `.finalized` / `.sent` / `.paid` / `.payment_failed` / `.voided` / `.marked_uncollectible` | billing routes; payment through the hosted invoice session                                                                                                                                                                                                                                                                                          |
+| `customer.subscription.created` / `.updated` / `.deleted`                                                      | monthly price, 30-day trial → update (`cancel_at_period_end`) → cancel                                                                                                                                                                                                                                                                              |
+| not supported                                                                                                  | `refund.failed` (a leg failing after the transfer is held for review; the refund stays pending), `invoice.overdue`, `customer.subscription.renewal_upcoming` (need a billing clock test helper), `agent_payment.*` (needs a sandbox-funded agent signer), `review.*`, `account.updated`, `ping`, `mandate.*` (needs a payer-funded Stage 4 mandate) |
 
 ## Options and environment
 
@@ -107,7 +110,7 @@ pnpm build:binaries       # single-file binary for this platform (needs bun)
 ```
 
 The spec mock (`test/support/spec-mock.ts`) validates every request and response — and every SSE frame
-— against `@nearpay/spec` 0.3.0; the fake (`test/support/fake-nearpay.ts`) implements the routes the CLI
+— against `@nearpay-money/spec` 0.5.0; the fake (`test/support/fake-nearpay.ts`) implements the routes the CLI
 uses with their documented behaviour (device login with `slow_down`, stream resume and `reset`, sandbox
 scenarios).
 
@@ -147,6 +150,6 @@ is not in v1 (no request-log API).
 
 Libraries (hackathon rule Q-005): [`commander`](https://github.com/tj/commander.js) (command line),
 [`@napi-rs/keyring`](https://github.com/Brooooooklyn/keyring-node) (OS keychain), [`zod`](https://zod.dev)
-(with `@nearpay/spec`); dev: TypeScript, Biome, Vitest, fast-check, `@nearpay/node` (signature
+(with `@nearpay-money/spec`); dev: TypeScript, Biome, Vitest, fast-check, `@nearpay-money/node` (signature
 verification in tests), Bun (single-file binaries). Code and documentation are written with AI
 assistance (Claude) under human direction and review.

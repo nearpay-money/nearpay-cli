@@ -1,6 +1,6 @@
 /**
  * The built `nearpay` binary (dist/cli.js) as a child process against the stateful fake NearPay
- * (spec-validating, SSE included) and a local webhook receiver that verifies with @nearpay/node.
+ * (spec-validating, SSE included) and a local webhook receiver that verifies with @nearpay-money/node.
  */
 import { type ChildProcess, spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
@@ -9,8 +9,8 @@ import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { constructEvent } from "@nearpay/node";
-import { streamEvents } from "@nearpay/spec";
+import { constructEvent } from "@nearpay-money/node";
+import { streamEvents } from "@nearpay-money/spec";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { type FakeNearPay, startFakeNearPay } from "../support/fake-nearpay.js";
 
@@ -115,7 +115,7 @@ describe("nearpay binary", () => {
     expect(await after.exit).toBe(3);
   });
 
-  it("listen --forward-to: signed forwards verify with @nearpay/node; resumes after the server closes the stream", async () => {
+  it("listen --forward-to: signed forwards verify with @nearpay-money/node; resumes after the server closes the stream", async () => {
     const received: { sig: string; id: string; type: string; body: string }[] = [];
     const receiver: Server = createServer((req, res) => {
       let body = "";

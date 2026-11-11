@@ -12,7 +12,7 @@ import {
   idPattern,
   safeParseTolerant,
   streamEvents,
-} from "@nearpay/spec";
+} from "@nearpay-money/spec";
 import type { z } from "zod";
 import type { ApiClient } from "./api.js";
 import { BACKOFF_MAX_MS, backoffDelay, RecentIds } from "./backoff.js";
@@ -142,7 +142,7 @@ export async function runEventStream(o: StreamOptions, h: StreamHandlers): Promi
             if (f.event === "ready") {
               const r = safeParseTolerant(EventStreamReady, safeJson(f.data));
               if (!r.success) {
-                warnOnce("ready", "the stream's ready frame does not match @nearpay/spec; continuing");
+                warnOnce("ready", "the stream's ready frame does not match @nearpay-money/spec; continuing");
               } else {
                 ready = true;
                 failures = 0;
@@ -171,7 +171,7 @@ export async function runEventStream(o: StreamOptions, h: StreamHandlers): Promi
                 issue = `${i?.path.join(".") || "(root)"}: ${i?.message ?? "invalid"}`;
                 warnOnce(
                   `type:${type}`,
-                  `event type ${type} does not match this CLI's @nearpay/spec (${issue}); forwarded as received`,
+                  `event type ${type} does not match this CLI's @nearpay-money/spec (${issue}); forwarded as received`,
                 );
               }
               await h.onEvent({ id, type, raw: f.data, event: parsed.success ? parsed.data : null, issue, objectId });

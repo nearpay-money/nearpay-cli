@@ -1,8 +1,8 @@
 /** The command tree run in-process (`run(rt, argv)`) against the fake NearPay. */
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
-import { constructEvent } from "@nearpay/node";
-import { pollCliLogin, streamEvents } from "@nearpay/spec";
+import { constructEvent } from "@nearpay-money/node";
+import { pollCliLogin, streamEvents } from "@nearpay-money/spec";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { checkTestKey } from "../../src/lib/context.js";
 import { CliError } from "../../src/lib/errors.js";

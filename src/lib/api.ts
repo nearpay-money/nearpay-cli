@@ -1,5 +1,5 @@
 /**
- * Minimal NearPay public API client driven by the `@nearpay/spec` route table: requests are validated
+ * Minimal NearPay public API client driven by the `@nearpay-money/spec` route table: requests are validated
  * with the route's own schemas before they leave, responses are parsed tolerantly (unknown open-enum
  * values allowed, api-conventions §5) and non-2xx answers become `ApiError` from the `ErrorEnvelope`.
  * Every POST carries an `Idempotency-Key` (api-conventions §4); retries of a request reuse it.
@@ -14,7 +14,7 @@ import {
   type RouteDefinition,
   type RouteResponse,
   safeParseTolerant,
-} from "@nearpay/spec";
+} from "@nearpay-money/spec";
 import type { z } from "zod";
 import { ApiError, CliError, InterruptedError, NetworkError, parseRetryAfter } from "./errors.js";
 import { type Clock, systemClock } from "./time.js";
@@ -234,9 +234,9 @@ export class ApiClient {
         if (!parsed.success) {
           const issue = parsed.error.issues[0];
           throw new CliError(
-            `${route.id}: response does not match @nearpay/spec (${issue?.path.join(".")}: ${issue?.message})`,
+            `${route.id}: response does not match @nearpay-money/spec (${issue?.path.join(".")}: ${issue?.message})`,
             1,
-            "Update the CLI (`npm i -g @nearpay/cli`); if it is current, report this to NearPay.",
+            "Update the CLI (`npm i -g @nearpay-money/cli`); if it is current, report this to NearPay.",
           );
         }
         return { data: parsed.data as RouteResponse<R>, status: res.status, headers: res.headers };

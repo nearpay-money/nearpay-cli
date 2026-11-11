@@ -1,5 +1,5 @@
 /** `nearpay listen [--events t1,t2] [--forward-to URL] [--print-json]` (sdks-and-tools §3). */
-import { WEBHOOK_TYPE_NAMES } from "@nearpay/spec";
+import { WEBHOOK_TYPE_NAMES } from "@nearpay-money/spec";
 import { type GlobalOptions, type Runtime, resolveSession } from "../lib/context.js";
 import { CliError, EXIT } from "../lib/errors.js";
 import { forwardEvent, parseForwardTarget, SerialQueue } from "../lib/forward.js";
@@ -52,7 +52,7 @@ export async function listenCommand(rt: Runtime, g: GlobalOptions, o: ListenOpti
   if (secret) {
     out.info(
       `${c.green("Ready!")} Your webhook signing secret for this session is ${c.bold(secret)}\n` +
-        "  Verify forwarded events with it, e.g. @nearpay/node constructEvent(rawBody, signature, secret).\n" +
+        "  Verify forwarded events with it, e.g. @nearpay-money/node constructEvent(rawBody, signature, secret).\n" +
         "  It is printed once and changes every time you run `nearpay listen`.",
     );
   }

@@ -1,5 +1,5 @@
 /** `nearpay login`, `nearpay logout`, `nearpay whoami`. */
-import { listEvents } from "@nearpay/spec";
+import { listEvents } from "@nearpay-money/spec";
 import { anonymousApi, type GlobalOptions, profileName, type Runtime, resolveSession, stores } from "../lib/context.js";
 import { FILE_FALLBACK_WARNING } from "../lib/credentials.js";
 import { deviceLogin, deviceNameFrom } from "../lib/login.js";

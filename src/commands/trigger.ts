@@ -1,5 +1,5 @@
 /** `nearpay trigger [event] [--list] [--no-wait] [--timeout s]` (sdks-and-tools §3). */
-import { WEBHOOK_TYPE_NAMES } from "@nearpay/spec";
+import { WEBHOOK_TYPE_NAMES } from "@nearpay-money/spec";
 import { type GlobalOptions, type Runtime, resolveSession } from "../lib/context.js";
 import { CliError, EXIT } from "../lib/errors.js";
 import { unixNow } from "../lib/time.js";

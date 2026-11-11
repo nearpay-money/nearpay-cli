@@ -34,7 +34,7 @@ import {
   voidInvoice,
   WEBHOOK_TYPE_NAMES,
   type WebhookType,
-} from "@nearpay/spec";
+} from "@nearpay-money/spec";
 import type { ApiClient } from "./api.js";
 import { CliError, EXIT } from "./errors.js";
 import type { Clock } from "./time.js";
@@ -290,6 +290,8 @@ const invoiceAt = (type: WebhookType, stage: InvoiceStage, summary: string): Fix
 });
 
 const unsupported = (reason: string): Fixture => ({ kind: "unsupported", reason });
+const MANDATE_REASON =
+  "needs a payer-funded auto-debit mandate (Stage 4, spec 0.4.0); the CLI test key cannot act as the payer";
 
 export const TRIGGERS = {
   "checkout.session.completed": paymentSucceeded(
@@ -552,6 +554,16 @@ export const TRIGGERS = {
   "customer.subscription.renewal_upcoming": unsupported(
     "needs a billing test helper that advances a subscription's clock (not in spec 0.3.0)",
   ),
+  // Stage 4 auto-debit (spec 0.4.0): a mandate is created and funded by the payer's wallet in the subscription
+  // vault; the CLI's test key cannot act as the payer, so mandate events are not triggerable yet.
+  "mandate.activated": unsupported(MANDATE_REASON),
+  "mandate.collected": unsupported(MANDATE_REASON),
+  "mandate.insufficient_funds": unsupported(MANDATE_REASON),
+  "mandate.canceled": unsupported(MANDATE_REASON),
+  "mandate.exhausted": unsupported(MANDATE_REASON),
+  "mandate.updated": unsupported(MANDATE_REASON),
+  "mandate.unlinked": unsupported(MANDATE_REASON),
+  "mandate.released": unsupported(MANDATE_REASON),
 } satisfies Record<WebhookType, Fixture>;
 
 export function fixtureFor(type: string): Fixture | null {

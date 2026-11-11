@@ -16,7 +16,7 @@ describe("package", () => {
     const pkg = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
     expect(CLI_VERSION).toBe(pkg.version);
     expect(pkg.bin).toEqual({ nearpay: "./dist/cli.js" });
-    expect(pkg.dependencies["@nearpay/spec"]).toBe("0.3.0");
+    expect(pkg.dependencies["@nearpay-money/spec"]).toBe("0.5.0");
     expect(userAgent()).toMatch(/^nearpay-cli\/\S+ node\/v\d+/);
   });
 });

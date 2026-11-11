@@ -28,7 +28,7 @@ import {
   type RouteParams,
   type RouteQuery,
   type RouteResponse,
-} from "@nearpay/spec";
+} from "@nearpay-money/spec";
 
 export interface MockRequest<R extends AnyRoute = AnyRoute> {
   readonly route: R;
