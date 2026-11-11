@@ -11,9 +11,9 @@ importers:
       '@napi-rs/keyring':
         specifier: 2.1.2
         version: 2.1.2
-      '@nearpay/spec':
-        specifier: 0.3.0
-        version: 0.3.0(zod@4.6.7)
+      '@nearpay-money/spec':
+        specifier: 0.5.0
+        version: 0.5.0(zod@4.6.7)
       commander:
         specifier: 14.0.3
         version: 14.0.3
@@ -24,9 +24,9 @@ importers:
       '@biomejs/biome':
         specifier: 2.6.5
         version: 2.6.5
-      '@nearpay/node':
-        specifier: 0.1.0
-        version: 0.1.0(zod@4.6.7)
+      '@nearpay-money/node':
+        specifier: 0.4.0
+        version: 0.4.0(zod@4.6.7)
       '@types/node':
         specifier: 22.20.5
         version: 22.20.5
@@ -369,20 +369,14 @@ packages:
     resolution: {integrity: sha512-9i1SR6tYeQ3o1beLeVMxhN6Fq513m9TZlTs+46+4JgvSNkaFoW9S4WrpV5MjzE+0CzVoC+dZ4RfZDIgW6+afnQ==}
     engines: {node: '>= 10'}
 
-  '@nearpay/node@0.1.0':
-    resolution: {integrity: sha512-lIEAE70Yc+/9QWSZ7IxGDUqRFMwEYJvMUqd8Kq5THE11CQ1dlvz1iPL+IplSIip+ZZgSk3OHgJdj4foLtcjnhw==}
+  '@nearpay-money/node@0.4.0':
+    resolution: {integrity: sha512-sVLexXBCXzRZmmpAZWVKcqc/dUM+K0MD2gCGpFUvxu/p+dj1yJLKtVsYiCtWwxWoX77Vw02RNL0FFIZtet198w==}
     engines: {node: '>=22.11.0'}
     peerDependencies:
       zod: ^4.6.7
 
-  '@nearpay/spec@0.1.4':
-    resolution: {integrity: sha512-XGwDLXWKb3Q/BC1RybRf0C0TVIllkuytmjzkpRucAp6yCmrGHZq0COOTqRbXIaJMhf6wbCgWDNiIQECdsa/qow==}
-    engines: {node: '>=22.11.0'}
-    peerDependencies:
-      zod: ^4.6.7
-
-  '@nearpay/spec@0.3.0':
-    resolution: {integrity: sha512-jBGwGvnN0E/CooJ3ixz3BFcG8xq/OR6Q4Hwj0+yo7hiYw0KcHE8zrbkwt4zCKE34QRMx11+3kHRriIFwgoAtJg==}
+  '@nearpay-money/spec@0.5.0':
+    resolution: {integrity: sha512-hvuwO+DjlZu4PIxQTjYWkZuTeg8pVPEMLTFDHqz7P9h2z/L7U6YNh+O9pI6j/90hnZotkAbVMUb9Rje5YDldQw==}
     engines: {node: '>=22.11.0'}
     peerDependencies:
       zod: ^4.6.7
@@ -1155,16 +1149,12 @@ snapshots:
       '@napi-rs/keyring-win32-ia32-msvc': 2.1.2
       '@napi-rs/keyring-win32-x64-msvc': 2.1.2
 
-  '@nearpay/node@0.1.0(zod@4.6.7)':
+  '@nearpay-money/node@0.4.0(zod@4.6.7)':
     dependencies:
-      '@nearpay/spec': 0.1.4(zod@4.6.7)
+      '@nearpay-money/spec': 0.5.0(zod@4.6.7)
       zod: 4.6.7
 
-  '@nearpay/spec@0.1.4(zod@4.6.7)':
-    dependencies:
-      zod: 4.6.7
-
-  '@nearpay/spec@0.3.0(zod@4.6.7)':
+  '@nearpay-money/spec@0.5.0(zod@4.6.7)':
     dependencies:
       zod: 4.6.7
 

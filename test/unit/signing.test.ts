@@ -1,14 +1,14 @@
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { constructEvent } from "@nearpay/node";
-import { parseSignatureHeader, WebhookEndpoint } from "@nearpay/spec";
+import { constructEvent } from "@nearpay-money/node";
+import { parseSignatureHeader, WebhookEndpoint } from "@nearpay-money/spec";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { computeV1, generateWebhookSecret, LOCAL_SECRET_LENGTH, signatureHeader } from "../../src/lib/signing.js";
 
 const require = createRequire(import.meta.url);
 const vectors = JSON.parse(
-  readFileSync(require.resolve("@nearpay/spec/test-vectors/webhook-signatures.json"), "utf8"),
+  readFileSync(require.resolve("@nearpay-money/spec/test-vectors/webhook-signatures.json"), "utf8"),
 ) as {
   secret: string;
   timestamp: number;
@@ -32,7 +32,7 @@ describe("local webhook signing", () => {
     expect(h?.kid).toBeNull();
   });
 
-  it("is verified by @nearpay/node constructEvent with the printed secret", () => {
+  it("is verified by @nearpay-money/node constructEvent with the printed secret", () => {
     const secret = generateWebhookSecret();
     const t = Math.floor(Date.now() / 1000);
     const ev = constructEvent(vectors.raw_body, signatureHeader(secret, t, vectors.raw_body), secret);

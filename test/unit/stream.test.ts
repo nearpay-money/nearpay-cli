@@ -1,4 +1,4 @@
-import { streamEvents } from "@nearpay/spec";
+import { streamEvents } from "@nearpay-money/spec";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ApiClient } from "../../src/lib/api.js";
 import { CliError, InterruptedError } from "../../src/lib/errors.js";

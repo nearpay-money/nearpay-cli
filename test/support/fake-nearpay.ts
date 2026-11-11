@@ -52,7 +52,7 @@ import {
   updateSubscription,
   voidInvoice,
   WEBHOOK_TYPE_NAMES,
-} from "@nearpay/spec";
+} from "@nearpay-money/spec";
 import type { z } from "zod";
 import { MockApiError, type SpecMock, type SseSink, startSpecMock } from "./spec-mock.js";
 

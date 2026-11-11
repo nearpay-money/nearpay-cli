@@ -1,5 +1,5 @@
 /** `nearpay events list` and `nearpay events resend <evt_…>` (sdks-and-tools §3). */
-import { idPattern, listEvents, resendEvent } from "@nearpay/spec";
+import { idPattern, listEvents, resendEvent } from "@nearpay-money/spec";
 import { type GlobalOptions, type Runtime, resolveSession } from "../lib/context.js";
 import { CliError, EXIT } from "../lib/errors.js";
 import { formatTime } from "../lib/output.js";

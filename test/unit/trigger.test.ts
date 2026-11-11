@@ -6,7 +6,7 @@ import {
   simulateRefundDeposit,
   WEBHOOK_TYPE_NAMES,
   type WebhookType,
-} from "@nearpay/spec";
+} from "@nearpay-money/spec";
 import fc from "fast-check";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ApiClient } from "../../src/lib/api.js";

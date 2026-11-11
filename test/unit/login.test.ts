@@ -1,4 +1,4 @@
-import { CliLogin, createCliLogin, pollCliLogin } from "@nearpay/spec";
+import { CliLogin, createCliLogin, pollCliLogin } from "@nearpay-money/spec";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ApiClient } from "../../src/lib/api.js";
 import { CliError, InterruptedError } from "../../src/lib/errors.js";
@@ -58,7 +58,7 @@ function setup(o: { interval?: number; ttl?: number; url?: string } = {}) {
       return true;
     },
     deviceName: "test-host",
-    clientVersion: "0.1.0",
+    clientVersion: "0.2.0",
     openBrowser: true,
     signal: ac.signal,
   };
@@ -93,7 +93,7 @@ describe("deviceLogin", () => {
     expect(opened).toEqual(["https://dashboard.nearpay.localhost/cli?code=BCDF-GHJK"]);
     expect(captured.stderr).toContain("Your pairing code is: BCDF-GHJK");
     const create = mock.callsTo(createCliLogin)[0];
-    expect(create?.body).toEqual({ device_name: "test-host", client_version: "0.1.0" });
+    expect(create?.body).toEqual({ device_name: "test-host", client_version: "0.2.0" });
     expect(create?.headers.authorization).toBeUndefined();
     expect(mock.violations).toEqual([]);
   });

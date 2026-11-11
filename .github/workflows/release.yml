@@ -1,0 +1,88 @@
+# Publishes `@nearpay-money/cli` to the public npm registry.
+# Trigger: push a version tag (`git tag v<version> && git push origin v<version>`) or run it by hand
+# (Actions → release → Run workflow; "dry_run" packs and runs `npm publish --dry-run` only).
+# Release order across repositories: nearpay-spec first (every package depends on @nearpay-money/spec), then nearpay-node, nearpay-js, nearpay-agentkit, and nearpay-cli last (nearpay/RELEASING.md).
+# Idempotent: versions already on npm are skipped. Provenance is attached only when this repository is public.
+name: release
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Pack and run npm publish --dry-run only
+        type: boolean
+        default: false
+permissions:
+  contents: read
+  id-token: write # npm provenance (used only when the repository is public)
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+      TESTCONTAINERS_RYUK_DISABLED: "true"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      # GitHub's runners cannot reach NearPay's private registry. The job runs its own throwaway Verdaccio on
+      # 127.0.0.1:4873 (the address this repository's .npmrc already routes @nearpay-money/* and @nearpay-internal/*
+      # to) and seeds it byte for byte from nearpay-deploy/registry-seed, so `--frozen-lockfile` resolves exactly the
+      # tarballs the lockfile was made against. nearpay-deploy is private: NP_DEPLOY_READ_TOKEN is a fine-grained
+      # token with read-only Contents access to nearpay-money/nearpay-deploy (nearpay/RELEASING.md).
+      - name: Check out the registry seed (nearpay-deploy)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: nearpay-money/nearpay-deploy
+          token: ${{ secrets.NP_DEPLOY_READ_TOKEN }}
+          path: .ci/nearpay-deploy
+          sparse-checkout: |
+            registry-seed
+            scripts/lib/registry-seed.mjs
+          persist-credentials: false
+      - name: Start and seed the job's local registry
+        run: |
+          v="$RUNNER_TEMP/verdaccio"
+          mkdir -p "$v/storage"
+          cat > "$v/config.yaml" <<'YAML'
+          storage: ./storage
+          auth:
+            htpasswd:
+              file: ./htpasswd
+              max_users: 10
+          packages:
+            "@nearpay-money/*": { access: $all, publish: $authenticated }
+            "@nearpay-internal/*": { access: $all, publish: $authenticated }
+            "@nearpay/*": { access: $all, publish: $authenticated }
+            "**": { access: $all }
+          log: { type: stdout, format: pretty, level: warn }
+          YAML
+          openssl rand -hex 24 > "$v/password"
+          (cd "$v" && nohup npx -y verdaccio@6.10.6 -c config.yaml --listen 127.0.0.1:4873 > verdaccio.log 2>&1 &)
+          for _ in $(seq 1 60); do curl -fsS http://127.0.0.1:4873/-/ping >/dev/null 2>&1 && break; sleep 1; done
+          curl -fsS http://127.0.0.1:4873/-/ping >/dev/null || { cat "$v/verdaccio.log"; exit 1; }
+          node .ci/nearpay-deploy/scripts/lib/registry-seed.mjs http://127.0.0.1:4873 .ci/nearpay-deploy/registry-seed "$v/password"
+          rm -rf .ci # keep the seed checkout out of lint and tests
+      - run: pnpm install --frozen-lockfile
+      - name: Verify
+        run: pnpm verify && pnpm build
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+          REPO_PRIVATE: ${{ github.event.repository.private }}
+        run: |
+          flags=()
+          [ "$DRY_RUN" = true ] && flags+=(--dry-run)
+          [ "$REPO_PRIVATE" = false ] && flags+=(--provenance)
+          scripts/publish-npm.sh "${flags[@]}" .

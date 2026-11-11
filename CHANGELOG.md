@@ -1,6 +1,16 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-11-11 (package rename, `@nearpay-money/spec` 0.5.0)
+
+Package rename (ADR-0025): published as **`@nearpay-money/cli`** (npm org `nearpay-money`); the `@nearpay` npm scope
+belongs to an unrelated company, and `@nearpay/cli` 0.1.0 was only on NearPay's local registry. The bin is still
+`nearpay`: `npm install -g @nearpay-money/cli`. `CLI_VERSION` (User-Agent, `client_version` at login) is `0.2.0`.
+
+- `@nearpay-money/spec` 0.3.0 → 0.5.0 (additive contracts); dev: `@nearpay-money/node` 0.4.0. The eight Stage 4
+  `mandate.*` webhook types are listed by `nearpay trigger` as not supported (they need a payer-funded mandate).
+- Package metadata for the public registry (`repository`, `homepage`, `bugs`, `keywords`, `publishConfig`).
+- `.github/workflows/release.yml`: a `v*` tag (or a manual run) verifies and publishes to npm, skipping a version that
+  is already there.
 
 ### Fixed
 

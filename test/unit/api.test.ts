@@ -7,7 +7,7 @@ import {
   simulateRefundDeposit,
   streamEvents,
   updateSubscription,
-} from "@nearpay/spec";
+} from "@nearpay-money/spec";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ApiClient, normaliseBaseUrl } from "../../src/lib/api.js";
 import { ApiError, CliError, InterruptedError, NetworkError, parseRetryAfter } from "../../src/lib/errors.js";
