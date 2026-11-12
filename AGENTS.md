@@ -1,6 +1,6 @@
 # AGENTS.md — nearpay-cli
 
-You are working in **nearpay-cli**, one of 27 NearPay repositories (`nearpay-brain/architecture/repositories.md`).
+You are working in **nearpay-cli**, one of 26 NearPay repositories (`nearpay-brain/architecture/repositories.md`).
 Scope: Developer CLI (test mode): login, listen (forward events to localhost, re-signed like webhooks), trigger test events, list and resend events. `logs tail` is not in v1 (no request-log API).
 
 ## Before changing anything

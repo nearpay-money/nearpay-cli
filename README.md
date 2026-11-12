@@ -1,6 +1,11 @@
 # nearpay-cli
 
-> Developer CLI: login, listen (forward webhooks to localhost), trigger test events, resend events.
+`@nearpay-money/cli`: the developer CLI (`nearpay`) to log in, stream events and forward them to a local webhook handler, trigger test events and resend events.
+
+Part of [NearPay](https://github.com/nearpay-money/nearpay) — start there for the live demo, the architecture diagram and the full "do X, see Y" walkthrough.
+
+- **Where it sits:** on a developer's machine. It calls only the public API (https://api.nearpay.money): identity for the device login, the webhooks service for the events stream and resend, payments and billing for the trigger fixtures. It depends on `@nearpay-money/spec` only.
+- **Status:** published on npm as [`@nearpay-money/cli`](https://www.npmjs.com/package/@nearpay-money/cli) 0.2.0. NearPay runs on NEAR mainnet as a closed beta (https://nearpay.money); the CLI itself works in test mode only.
 
 |                                       |                                                                                         |
 | ------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -25,6 +30,25 @@ Or download the single-file binary for your OS from the CI artifacts (`nearpay-<
 
 Documentation: https://docs.nearpay.money · Website: https://nearpay.money. Before 0.2.0 the package was named
 `@nearpay/cli` on NearPay's private registry only; NearPay never publishes under the `@nearpay` npm scope.
+
+## Verify this repo
+
+Without an account (Node ≥ 22.11):
+
+1. `npm install -g @nearpay-money/cli && nearpay --version` → prints `0.2.0`.
+2. `nearpay trigger` → the list `Supported events (real test-mode API calls):`, then `Not supported in this version:` with the reason for each. No login needed.
+3. `nearpay whoami` → `error: not logged in`, exit code `3`.
+
+With a NearPay account: the "Do X → see Y" table below, starting with `nearpay login`. The [entry repo](https://github.com/nearpay-money/nearpay) has the walkthrough for trying NearPay live.
+
+From this repo (Node 22, pnpm 9, no Docker):
+
+1. Start the local package registry that `.npmrc` points the NearPay scopes at:
+   `git clone https://github.com/nearpay-money/nearpay-deploy ../nearpay-deploy && ../nearpay-deploy/scripts/registry.sh start`
+   → `curl http://127.0.0.1:4873/-/ping` answers `{}`.
+2. `pnpm install --frozen-lockfile` → ends with `Done in …`, no registry errors.
+3. `pnpm test` (unit and property tests against an in-process, spec-validating mock API with SSE) → `Test Files  10 passed (10)`, `Tests  132 passed (132)`.
+4. `pnpm verify` (the full gate: typecheck, lint, unit tests with the coverage gate, then a build and the built `nearpay` binary run end to end against a stateful fake API) → exits 0; the integration step reports `Test Files  1 passed (1)`, `Tests  3 passed (3)`.
 
 ## Do X → see Y
 
@@ -102,7 +126,7 @@ error, never a silent downgrade. A credentials file readable by others is refuse
 ## Development
 
 ```sh
-pnpm install
+pnpm install --frozen-lockfile
 pnpm test                 # unit + property tests (in-process, spec-validating mock API with SSE)
 pnpm test:integration     # builds, then runs the `nearpay` binary against a stateful fake API
 pnpm verify               # typecheck, lint, coverage gate, integration
@@ -116,12 +140,12 @@ scenarios).
 
 ## Documentation
 
-This repo stays surgical: design docs live in [`nearpay-brain`](../nearpay-brain/README.md), not here.
+Design docs live in [`nearpay-brain`](https://github.com/nearpay-money/nearpay-brain), not here.
 
-- `nearpay-brain/lld/sdks-and-tools.md` §3 — **low-level design (dev-ready; implement from this)**
-- `nearpay-brain/lld/identity.md` §6.2 (CLI login), `nearpay-brain/lld/webhooks.md` §5.1 (events stream), §6 (signatures)
-- `nearpay-brain/roadmap/development-plan.md` — stage and step this repo is built in
-- `nearpay-brain/architecture/api-conventions.md#9-webhooks`
+- [`lld/sdks-and-tools.md`](https://github.com/nearpay-money/nearpay-brain/blob/main/lld/sdks-and-tools.md) §3 — low-level design this repo is implemented from
+- [`lld/identity.md`](https://github.com/nearpay-money/nearpay-brain/blob/main/lld/identity.md) §6.2 (CLI login), [`lld/webhooks.md`](https://github.com/nearpay-money/nearpay-brain/blob/main/lld/webhooks.md) §5.1 (events stream), §6 (signatures)
+- [`roadmap/development-plan.md`](https://github.com/nearpay-money/nearpay-brain/blob/main/roadmap/development-plan.md) — stage and step this repo is built in
+- [`architecture/api-conventions.md#9-webhooks`](https://github.com/nearpay-money/nearpay-brain/blob/main/architecture/api-conventions.md#9-webhooks)
 
 ## Layout
 
@@ -148,8 +172,11 @@ is not in v1 (no request-log API).
 
 ## Built with
 
-Libraries (hackathon rule Q-005): [`commander`](https://github.com/tj/commander.js) (command line),
-[`@napi-rs/keyring`](https://github.com/Brooooooklyn/keyring-node) (OS keychain), [`zod`](https://zod.dev)
-(with `@nearpay-money/spec`); dev: TypeScript, Biome, Vitest, fast-check, `@nearpay-money/node` (signature
-verification in tests), Bun (single-file binaries). Code and documentation are written with AI
-assistance (Claude) under human direction and review.
+- Runtime: [`commander`](https://github.com/tj/commander.js) (command line),
+  [`@napi-rs/keyring`](https://github.com/Brooooooklyn/keyring-node) (OS keychain), [`zod`](https://zod.dev)
+  (with `@nearpay-money/spec`).
+- Development: TypeScript, Biome, Vitest, fast-check, `@nearpay-money/node` (signature verification in tests), Bun
+  (single-file binaries).
+- Licence: Apache-2.0 (`LICENSE`).
+
+Code and documentation are written with AI assistance (Claude) under human direction and review. Built for the NEAR Hackathon (Nov 2026).
