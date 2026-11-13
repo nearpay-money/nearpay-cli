@@ -62,7 +62,7 @@ jobs:
       # (127.0.0.1:4873, where .npmrc points): Verdaccio seeded with the exact tarballs the lockfile pins
       # (nearpay-deploy: scripts/registry.sh, registry-seed/). It needs Node.js, so it runs after setup-node.
       - name: Start the local package registry
-        if: ${{ vars.NP_REGISTRY_URL == '' && runner.os != 'Windows' }}
+        if: ${{ vars.NP_REGISTRY_URL == '' }}
         uses: nearpay-money/nearpay-deploy/.github/actions/registry@main
       - name: Point the NearPay scopes at the CI registry
         if: ${{ vars.NP_REGISTRY_URL != '' }}
